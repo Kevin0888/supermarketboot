@@ -48,6 +48,7 @@ public class SuperMarketController {
     @RequestMapping(path ="/login", produces = {"text/html;charset=UTF-8"})
     public String login(HttpServletRequest req) {
         logger.info("----进入login方法");
+        System.out.println("----进入登录方法---");
         String username = req.getParameter("username");
         if (StringUtils.isEmpty(username)) {
             req.setAttribute("message", "username can not be empty");

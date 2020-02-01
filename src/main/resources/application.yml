@@ -6,11 +6,13 @@ server:
     uri-encoding: UTF-8
 spring:
   #--------------------------charset--------------------------
+  messages:
+    encoding: UTF-8
   http:
     encoding:
+      force: true
       charset: UTF-8
       enabled: true
-      force: true
 
   mvc:
     static-path-pattern: /**
