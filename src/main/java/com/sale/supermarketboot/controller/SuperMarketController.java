@@ -409,15 +409,20 @@ public class SuperMarketController {
         List<OrderItemVO> ord = supermarketService.getAllChecked(Integer.parseInt(shopNumber));
         for (OrderItemVO item1 : ord) {
             totalCost += item1.getTotal();
+            category += item1.getCount();
         }
-        category = ord.size();
+//        category = ord.size();
         req.setAttribute("shoppingNum", shopNumber);
         req.setAttribute("orderItemList", ord);
-        req.setAttribute("total_cost", String.valueOf(totalCost));
-        req.setAttribute("category", String.valueOf(category));
+        req.setAttribute("total_cost", totalCost);
+        req.setAttribute("category", category);
         req.setAttribute("checkout_type", 0);
         req.setAttribute("cash_receive", cashReceive);
         req.setAttribute("cash_balance", cashBalance);
+        req.setAttribute("date",DateUtil.getCurrDateTime());
+        req.setAttribute("member_id", 0);
+        req.setAttribute("member_current_points", 0);
+        req.setAttribute("member_points", 0);
         return "receipt";
 
     }

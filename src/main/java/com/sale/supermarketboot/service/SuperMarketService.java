@@ -209,7 +209,20 @@ public class SuperMarketService {
         orderItem.setIsChecked(isChecked);
         orderItemDao.update(orderItem);
     }
-
+    /**
+     * 更新订单详情商品数量
+     *
+     * @param orderNumber
+     * @param count
+     */
+    public void updateOrderCount(int orderNumber, int commodityId, int count,double totalPrice) {
+        OrderItem orderItem = new OrderItem();
+        orderItem.setOrderNumber(orderNumber);
+        orderItem.setCommodityId(commodityId);
+        orderItem.setCount(count);
+        orderItem.setTotal(totalPrice);
+        orderItemDao.update(orderItem);
+    }
     /**
      * 更新库存数量
      *
@@ -334,35 +347,61 @@ public class SuperMarketService {
      */
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
     public int addCommodity(String commodityID, String count, String shoppingNumStr) {
+        int commodityCount = Integer.parseInt(count);
+        int commodityId = Integer.parseInt(commodityID);
         //根据Id查商品详情
         Commodity commodity = getCommodity(Integer.parseInt(commodityID));
-        if (commodity == null || commodity.getStock() <= 0) {
-            return 1;
+        if (commodity == null || commodity.getStock() < 0) {
+            return 0;
+        }
+        if (commodity.getStock() < commodityCount) {
+            commodityCount = commodity.getStock();
         }
         //根据流水号判断是否添加订单
-       int shoppingNumber = Integer.parseInt(shoppingNumStr);
+        int shoppingNumber = Integer.parseInt(shoppingNumStr);
         if (shoppingNumber == 0) {
             //初次购买，添加订单记录
             shoppingNumber = IDUtil.getId();
             addOrder(shoppingNumber);
         }
-
-        //转换实体CommodityOV，
-        CommodityVO commodityVO = new CommodityVO();
-        BeanUtils.copyProperties(commodity, commodityVO);
-        commodityVO.setCount(Integer.parseInt(count));
-        OrderItem orderItem = new OrderItem();
-        orderItem.setOrderNumber(shoppingNumber);
-        orderItem.setCommodityId(Integer.parseInt(commodityID));
-        orderItem.setCommodityName(commodity.getName());
-        orderItem.setPrice(commodity.getPrice());
-        orderItem.setCount(Integer.parseInt(count));
-        orderItem.setTotal(commodityVO.getTotalPrice());
-        orderItem.setIsChecked(0);
-        //添加订单详情
-        addOrderItem(orderItem);
+        //查询是否存在相同的订单商品
+        OrderItem sameOrder = getSameOrder(commodityId, shoppingNumber);
+        //没有相同订单，添加记录
+        if (sameOrder == null) {
+            //转换实体CommodityOV，
+            CommodityVO commodityVO = new CommodityVO();
+            commodityVO.setPrice(commodity.getPrice());
+            commodityVO.setCount(commodityCount);
+            OrderItem orderItem = new OrderItem();
+            orderItem.setOrderNumber(shoppingNumber);
+            orderItem.setCommodityId(commodityId);
+            orderItem.setCommodityName(commodity.getName());
+            orderItem.setPrice(commodity.getPrice());
+            orderItem.setCount(commodityCount);
+            orderItem.setTotal(commodityVO.getTotalPrice());
+            orderItem.setIsChecked(0);
+            //添加订单详情
+            addOrderItem(orderItem);
+            return shoppingNumber;
+        }
+        //存在相同订单，更新记录
+        commodityCount += sameOrder.getCount();
+        //如果库存小于购买数量，购买数量=库存
+        if (commodity.getStock() < commodityCount) {
+            commodityCount = commodity.getStock();
+        }
+        //转换实体CommodityOV
+        double totalPrice = commodityCount * commodity.getPrice();
+        //更新订单详情
+        updateOrderCount(shoppingNumber, commodityId, commodityCount, totalPrice);
         return shoppingNumber;
     }
+
+    public OrderItem getSameOrder(int commodityID, int shoppingNumber) {
+        return orderItemDao.getSameOrder(shoppingNumber, commodityID);
+    }
+
+
 
 
 }

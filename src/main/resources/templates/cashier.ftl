@@ -38,7 +38,8 @@
     };
 
     function calculate() {
-        var cash_receive = $("#receive_txt").val();
+        // var cash_receive = $("#receive_txt").text();
+        var cash_receive = $(" input[ name='receive_txt' ] ").val();
         var cash_cost = $("#total_cost_txt").text();
         var balance = cash_receive - cash_cost;
         if (balance < 0) {
@@ -142,7 +143,7 @@
             <tbody>
             <#list orderItemList as item>
                 <tr>
-                    <td align="center">${item.commodityId}</td>
+                    <td align="center">${item.commodityId?c}</td>
                     <td align="center">${item.commodityName}</td>
                     <td align="center">${item.specification}</td>
                     <td align="center">${item.units}</td>
@@ -165,7 +166,7 @@
         <input type="hidden" name="category" value="${category}">
         <input type="hidden" name="total_cost" value="${totalCost}">
         <hr>
-        <div>实收：￥ <input type="text" onblur="calculate()" id=" " value='0.00'/> 元 找零：￥ <label id="cash_balance_lbl">0.0</label> 元
+        <div>实收：￥ <input type="text" name="receive_txt" onblur="calculate()" id=" receive_txt" value='0.00'/> 元 找零：￥ <label id="cash_balance_lbl">0.0</label> 元
         </div>
         <input type="hidden" name="cash_receive" id="cash_receive">
         <input type="hidden" name="cash_balance" id="cash_balance">

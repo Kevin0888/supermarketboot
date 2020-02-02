@@ -16,4 +16,6 @@ public interface OrderItemDao {
 
     List<OrderItemVO> getAllUncheck(@Param("shopNum") int shopNum);
     List<OrderItemVO> getAllChecked(@Param("shopNum") int shopNum);
+
+    OrderItem getSameOrder(@Param("shopNum") int shopNum,@Param("commodityId") int commodityId);
 }
