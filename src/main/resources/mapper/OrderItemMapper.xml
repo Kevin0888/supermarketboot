@@ -52,7 +52,7 @@
     </select>
     <select id="getAllChecked" resultType="com.sale.supermarketboot.utils.OrderItemVO">
         SELECT
-        ord.commodity_Id as commodityId,
+        ord.commodity_id as commodityId,
         ord.commodity_name as commodityName,
         ord.count,
         ord.order_number as orderNumber,
@@ -63,7 +63,7 @@
         comm.stock
         FROM
         tb_order_item ord
-        LEFT JOIN tb_commodity AS comm ON ord.commodity_Id = comm.id
+        LEFT JOIN tb_commodity AS comm ON ord.commodity_id = comm.id
         WHERE
         <if test="shopNum != 0">
             order_number = #{shopNum} and is_checked = 1
